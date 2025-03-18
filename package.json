@@ -1,0 +1,24 @@
+{
+  "name": "real-state-mvc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon ./index.js"
+  },
+  "keywords": [
+    "MVC",
+    "MyQSL",
+    "Pug"
+  ],
+  "author": "Jorge Asillo",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "pug": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
