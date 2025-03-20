@@ -1,11 +1,18 @@
 import express from 'express'
-import router from './routes/user-routes.js'
+import userRoutes from './routes/userRoutes.js'
 
 // create server
 const app = express();
-app.use('/', router);
+
+// enable pug
 app.set('view engine', 'pug');
 app.set('views', './views');
+
+// public static
+app.use(express.static('public'));
+
+// routing
+app.use('/auth', userRoutes);
 
 // define port and start proyect
 const port = 3000;
