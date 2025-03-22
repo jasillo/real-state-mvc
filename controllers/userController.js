@@ -2,7 +2,7 @@
 
 const loginForm = (req, res) => {
     res.render('auth/login',{
-        authenticated: false
+        page: 'Iniciar Sesión'
     })
 }
 
@@ -12,7 +12,14 @@ const registerForm = (req, res) => {
     })
 }
 
+const recoveryPwdForm = (req, res) => {
+    res.render('auth/recoveryPwd',{
+        page: 'Recupera tu password'
+    })
+}
+
 export{
     loginForm,
-    registerForm
+    registerForm,
+    recoveryPwdForm
 }
