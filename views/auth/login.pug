@@ -16,4 +16,8 @@ block contain
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="pwd") Password
                         input#pwd.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Ingresa un password" type="password" name="pwd")
                     
+                    div.flex.items-center.justify-between
+                        a.text-gray-500.text-xs(href="/auth/register") No tengo cuenta.
+                        a.text-gray-500.text-xs(href="/auth/recovery-password") Olvide mi password.
+
                     Input(class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Iniciar Sesión") 
