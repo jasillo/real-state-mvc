@@ -1,5 +1,5 @@
-import express from 'express'
-import userRoutes from './routes/userRoutes.js'
+import express from 'express';
+import userRoutes from './routes/userRoutes.js';
 
 // create server
 const app = express();
@@ -10,6 +10,7 @@ app.set('views', './views');
 
 // public static
 app.use(express.static('public'));
+app.use(express.static('build'));
 
 // routing
 app.use('/auth', userRoutes);
