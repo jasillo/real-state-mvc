@@ -6,18 +6,22 @@
   "type": "module",
   "scripts": {
     "start": "nodemon ./index.js",
-    "css" :  "postcss ./public/css/tailwind.css -o ./build/app.css --watch"
+    "css": "postcss ./public/css/tailwind.css -o ./build/app.css --watch"
   },
   "keywords": [
     "MVC",
     "MyQSL",
-    "Pug"
+    "Pug",
+    "Sequelize"
   ],
   "author": "Jorge Asillo",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "pug": "^3.0.3"
+    "mysql2": "^3.14.0",
+    "pug": "^3.0.3",
+    "sequelize": "^6.37.6"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
