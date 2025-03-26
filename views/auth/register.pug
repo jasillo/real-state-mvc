@@ -6,16 +6,22 @@ block contain
             span.font-normal Raices
         h2.text-center.text-2xl.font-extrabold= page
 
-        div.mt-8.mx-auto.max-w-md
+        if (errors)
+            div.max-w-md.mx-auto.bg-red-400.mt-4.py-2.px-4
+                ul.list-disc
+                each error in errors
+                    li.text-white.uppercase.text-xs.p-1.font-bold.my-0= error.msg
+
+        div.mt-4.mx-auto.max-w-md
             div.bg-white.py-8.px-4.shadow
-                form.space-y-5(method="POST" action="/auth/register")
+                form.space-y-5(method="POST" action="/auth/register" noValidate)
                     div 
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="name") Nombre
-                        input#name.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Ingresa tu nombre" type="text" name="name")
+                        input#name.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Ingresa tu nombre" type="text" name="name" value=saved? saved.name:'')
 
                     div 
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="email") Email
-                        input#email.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Email de registro" type="email" name="email")
+                        input#email.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Email de registro" type="email" name="email" value=saved? saved.email:'')
                     div 
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="pwd") Password
                         input#pwd.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Ingresa un password" type="password" name="pwd")
