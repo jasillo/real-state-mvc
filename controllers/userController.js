@@ -1,5 +1,6 @@
 import { check, validationResult } from 'express-validator';
 import User from '../models/User.js';
+import { generateId } from '../helpers/tokens.js'
 
 const loginForm = (req, res) => {
     res.render('auth/login', {
@@ -13,41 +14,60 @@ const registerForm = (req, res) => {
     })
 };
 
-const registerUser = async (req, res) => {
-    await check('name').notEmpty().withMessage('El nombre no puede estar en blanco').run(req);
-    await check('email').isEmail().withMessage('Debe ingresar un email valido').run(req);
-    await check('pwd').isLength({ min: 8 }).withMessage('el password debe tener al menos 8 caracteres').run(req);
-    await check('rePwd').equals(req.body.pwd).withMessage('los passwords no son iguales').run(req);
-    let valErrors = validationResult(req);
+const registerValidator = [
+    check('name').notEmpty().withMessage('El nombre no puede estar en blanco'),
+    check('email').isEmail().withMessage('Debe ingresar un email valido'),
+    check('pwd').isLength({ min: 8 }).withMessage('el password debe tener al menos 8 caracteres'),
+    check('rePwd').custom((value, { req }) => {
+        if (value !== req.body.pwd) {
+            throw new Error('Los passwords no coinciden');
+        }
+        return true;
+    })
+];
 
-    console.log(req.body);
-    // check fields
+const singupUser = async (req, res) => {
+    // extract fields
+    const { name, email, pwd } = req.body;
+
+    // check fields' errors
+    let valErrors = validationResult(req);
     if (!valErrors.isEmpty()) {
         return res.render('auth/register', {
             page: 'Crear Cuenta',
             errors: valErrors.array(),
             saved: {
-                name: req.body.name,
-                email: req.body.email
+                name: name,
+                email: email
             }
         });
     }
 
-    // check duplicated user email
-    const userFound = await User.findOne({ where: { email: req.body.email } });
+    // check existing account by email
+    const userFound = await User.findOne({ where: { email: email } });
     if (userFound) {
         return res.render('auth/register', {
             page: 'Crear Cuenta',
             errors: [{ msg: 'este email ya esta registrado' }],
             saved: {
-                name: req.body.name,
-                email: req.body.email
+                name: name,
+                email: email
             }
         });
     }
 
-    const newUser = await User.create(req.body);
-    res.json(newUser);
+    await User.create({
+        name: name,
+        email: email,
+        pwd: pwd,
+        token: generateId()
+    });
+
+    // show succesfull message
+    res.render('templates/message',{
+        page: 'Cuenta creada correctamente',
+        message : 'Hemos enviado un email de confirmacion al correo'
+    })
 };
 
 const recoveryPwdForm = (req, res) => {
@@ -60,5 +80,6 @@ export {
     loginForm,
     registerForm,
     recoveryPwdForm,
-    registerUser
+    singupUser,
+    registerValidator
 };
