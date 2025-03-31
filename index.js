@@ -29,7 +29,7 @@ app.use(express.static('build'));
 app.use('/auth', userRoutes);
 
 // define port and start proyect
-const port = 3000;
+const port = process.env.PORT;
 app.listen(port, ()=> {
     console.log(`the server is running on the port ${port}`)
 });

@@ -1,6 +1,7 @@
 import { check, validationResult } from 'express-validator';
 import User from '../models/User.js';
 import { generateId } from '../helpers/tokens.js'
+import { registerEmail } from '../helpers/emails.js'
 
 const loginForm = (req, res) => {
     res.render('auth/login', {
@@ -56,18 +57,51 @@ const singupUser = async (req, res) => {
         });
     }
 
-    await User.create({
+    // create user with a verify email token
+    const user = await User.create({
         name: name,
         email: email,
         pwd: pwd,
         token: generateId()
     });
 
+    // send confirmation email
+    registerEmail({
+        name: user.name,
+        email: user.email,
+        token: user.token
+    });
+
+
     // show succesfull message
     res.render('templates/message',{
         page: 'Cuenta creada correctamente',
         message : 'Hemos enviado un email de confirmacion al correo'
     })
+};
+
+const verifyEmail = async (req, res) => {
+    const {token} = req.params;
+
+    // verify valid token
+    const user = await User.findOne({where: {token: token}});
+    if (!user) {
+        return res.render('auth/verifyEmail',{
+            page: 'Error al verificar email',
+            message: 'Hubo un error al verificar tu email',
+            error: true
+        });
+    }
+
+    // confirm account
+    user.token = null;
+    user.isVerified = true;
+    await user.save();
+
+    res.render('auth/verifyEmail',{
+        page: 'Cuenta verificada',
+        message: 'La cuenta se verifico correctamente'
+    });
 };
 
 const recoveryPwdForm = (req, res) => {
@@ -81,5 +115,6 @@ export {
     registerForm,
     recoveryPwdForm,
     singupUser,
+    verifyEmail,
     registerValidator
 };
