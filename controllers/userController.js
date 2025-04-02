@@ -11,7 +11,8 @@ const loginForm = (req, res) => {
 
 const registerForm = (req, res) => {
     res.render('auth/register', {
-        page: 'Crear Cuenta'
+        page: 'Crear Cuenta',
+        csrfToken: req.csrfToken()
     })
 };
 
@@ -28,42 +29,32 @@ const registerValidator = [
 ];
 
 const singupUser = async (req, res) => {
-    // extract fields
     const { name, email, pwd } = req.body;
+    const saved = { name, email };
+
+    const renderWithErrors = (errors) => {
+        return res.render('auth/register', {
+            page: 'Crear Cuenta',
+            errors,
+            csrfToken: req.csrfToken(),
+            saved
+        });
+    };
 
     // check fields' errors
     let valErrors = validationResult(req);
     if (!valErrors.isEmpty()) {
-        return res.render('auth/register', {
-            page: 'Crear Cuenta',
-            errors: valErrors.array(),
-            saved: {
-                name: name,
-                email: email
-            }
-        });
+        return renderWithErrors(valErrors.array());
     }
 
     // check existing account by email
     const userFound = await User.findOne({ where: { email: email } });
     if (userFound) {
-        return res.render('auth/register', {
-            page: 'Crear Cuenta',
-            errors: [{ msg: 'este email ya esta registrado' }],
-            saved: {
-                name: name,
-                email: email
-            }
-        });
+        return renderWithErrors([{ msg: 'este email ya esta registrado' }]);
     }
 
     // create user with a verify email token
-    const user = await User.create({
-        name: name,
-        email: email,
-        pwd: pwd,
-        token: generateId()
-    });
+    const user = await User.create({ name, email, pwd, token: generateId() });
 
     // send confirmation email
     registerEmail({
@@ -74,19 +65,19 @@ const singupUser = async (req, res) => {
 
 
     // show succesfull message
-    res.render('templates/message',{
+    res.render('templates/message', {
         page: 'Cuenta creada correctamente',
-        message : 'Hemos enviado un email de confirmacion al correo'
+        message: 'Hemos enviado un email de confirmacion al correo'
     })
 };
 
 const verifyEmail = async (req, res) => {
-    const {token} = req.params;
+    const { token } = req.params;
 
     // verify valid token
-    const user = await User.findOne({where: {token: token}});
+    const user = await User.findOne({ where: { token: token } });
     if (!user) {
-        return res.render('auth/verifyEmail',{
+        return res.render('auth/verifyEmail', {
             page: 'Error al verificar email',
             message: 'Hubo un error al verificar tu email',
             error: true
@@ -98,7 +89,7 @@ const verifyEmail = async (req, res) => {
     user.isVerified = true;
     await user.save();
 
-    res.render('auth/verifyEmail',{
+    res.render('auth/verifyEmail', {
         page: 'Cuenta verificada',
         message: 'La cuenta se verifico correctamente'
     });
