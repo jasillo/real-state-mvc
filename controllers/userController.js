@@ -4,34 +4,54 @@ import User from '../models/User.js';
 import { generateId, hashPwd } from '../helpers/tokens.js';
 import { emailConfirmAccount, emailRecoveryPwd } from '../helpers/emails.js'
 
+// ========================================================
+// SECTION: Login User
+// ========================================================
+
 /**
  * rendeer the login form page for firts time
  */
-const loginForm = (req, res) => {
-    res.render('auth/login', {
-        page: 'Iniciar Sesión',
-        csrfToken: req.csrfToken()
-    })
+const login = async (req, res) => {
+    const renderView = (errors) => {
+        return res.render('auth/login', {
+            page: 'Iniciar Sesión',
+            errors: errors?.length ? errors : null,
+            csrfToken: req.csrfToken(),
+        });
+    };
+
+    // req es empty, render an empty form
+    if (req.method === "GET") {
+        return renderView();
+    }
+
+    const { email, pwd } = req.body;
+
+    // check fields' errors
+    let valErrors = validationResult(req);
+    if (!valErrors.isEmpty()) {
+        return renderView(valErrors.array());
+    }
+
+    // check user
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+        return renderView([{ msg: 'usuario no encontrado' }]);
+    }
+
+    // check password
+    const valid = await user.verifyPassword(pwd);
+    if (!valid){
+        return renderView([{ msg: 'password incorrecto' }]);
+    }
+
+    // await User.create({ name: 'Jorge A', email: 'jorge.asillo@gg.com', pwd: "morituri"})
+    console.log('logeado');
 };
 
 // ========================================================
 // SECTION: Register new User
 // ========================================================
-
-/**
- * rules for validating the register form
- */
-const registerValidator = [
-    check('name').notEmpty().withMessage('El nombre no puede estar en blanco'),
-    check('email').isEmail().withMessage('Debe ingresar un email valido'),
-    check('pwd').isLength({ min: 8 }).withMessage('el password debe tener al menos 8 caracteres'),
-    check('rePwd').custom((value, { req }) => {
-        if (value !== req.body.pwd) {
-            throw new Error('Los passwords no coinciden');
-        }
-        return true;
-    })
-];
 
 /**
  * Create a new user.
@@ -126,20 +146,6 @@ const verifyEmail = async (req, res) => {
 // ========================================================
 // SECTION: Recovery Password
 // ========================================================
-
-/**
- * rules for validating the recovery password form
- */
-const emailValidator = [
-    check('email').isEmail().withMessage('Debe ingresar un email valido')
-];
-
-/**
- * rules for validating the recovery password form
- */
-const pwdValidator = [
-    check('pwd').isLength({ min: 8 }).withMessage('el password debe tener al menos 8 caracteres')
-];
 
 /**
  * restart password, send an email with a link for recovery password.
@@ -253,14 +259,53 @@ const createNewPwd = async (req, res) => {
     })
 }
 
+// ========================================================
+// SECTION: form validators
+// ========================================================
+
+/**
+ * rules for validating the register form
+ */
+const registerValidator = [
+    check('name').notEmpty().withMessage('El nombre no puede estar en blanco'),
+    check('email').isEmail().withMessage('Debe ingresar un email valido'),
+    check('pwd').isLength({ min: 8 }).withMessage('el password debe tener al menos 8 caracteres'),
+    check('rePwd').custom((value, { req }) => {
+        if (value !== req.body.pwd) {
+            throw new Error('Los passwords no coinciden');
+        }
+        return true;
+    })
+];
+
+const loginValidator = [
+    check('email').isEmail().withMessage('Debe ingresar un email valido'),
+    check('pwd').notEmpty().withMessage('el password debe tener al menos 8 caracteres'),
+];
+
+/**
+ * rules for validating the recovery password form
+ */
+const emailValidator = [
+    check('email').isEmail().withMessage('Debe ingresar un email valido')
+];
+
+/**
+ * rules for validating the recovery password form
+ */
+const pwdValidator = [
+    check('pwd').isLength({ min: 8 }).withMessage('el password debe tener al menos 8 caracteres')
+];
+
 
 export {
-    loginForm,
+    login,
     singupUser,
     verifyEmail,
     resetPwd,
     createNewPwd,
     registerValidator,
     emailValidator,
-    pwdValidator
+    pwdValidator,
+    loginValidator
 };
