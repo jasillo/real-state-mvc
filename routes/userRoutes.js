@@ -8,7 +8,7 @@ import {
     registerValidator,
     loginValidator,
     emailValidator,
-    pwdValidator
+    resetPwdValidator
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -23,6 +23,6 @@ router.get('/verify-email/:token', verifyEmail);
 router.get('/recovery-password', resetPwd);
 router.post('/recovery-password', emailValidator, resetPwd);
 router.get('/reset-password/:token', createNewPwd);
-router.post('/reset-password/:token', pwdValidator, createNewPwd);
+router.post('/reset-password/:token', resetPwdValidator, createNewPwd);
 
 export default router;

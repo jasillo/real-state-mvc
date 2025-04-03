@@ -5,13 +5,14 @@ import db from '../config/db.js'
 class User extends Model {
 
     /**
-     * update password methos
+     * update password and set token null
      * @param {string} newPassword - the new password
      * @returns {Promise<void>}
      */
     async updatePassword(newPassword) {
         const salt = await bcrypt.genSalt(10);
         this.pwd = await bcrypt.hash(newPassword, salt);
+        this.token = null;
         await this.save(); 
     }
 
@@ -25,7 +26,7 @@ class User extends Model {
     }
 }
 
-// Definir los atributos del modelo
+// Define User model
 User.init(
     {
         name: {

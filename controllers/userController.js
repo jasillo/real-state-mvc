@@ -1,7 +1,6 @@
 import { check, validationResult } from 'express-validator';
-import bcrypt from 'bcrypt';
 import User from '../models/User.js';
-import { generateId, hashPwd } from '../helpers/tokens.js';
+import { generateId } from '../helpers/tokens.js';
 import { emailConfirmAccount, emailRecoveryPwd } from '../helpers/emails.js'
 
 // ========================================================
@@ -9,7 +8,12 @@ import { emailConfirmAccount, emailRecoveryPwd } from '../helpers/emails.js'
 // ========================================================
 
 /**
- * rendeer the login form page for firts time
+ * Login.
+ * If req empty: render an empty form.
+ * If login fail: render login view with errors.
+ * If login success: 
+ * @param {{ email, pwd }} req 
+ * @returns {void} render login view
  */
 const login = async (req, res) => {
     const renderView = (errors) => {
@@ -62,48 +66,42 @@ const login = async (req, res) => {
  * @returns {void} render register or message view
  */
 const singupUser = async (req, res) => {
-    // req es empty, render an empty form
-    if (req.method === "GET") {
+    const renderView = (errors, saved) => {
         return res.render('auth/register', {
             page: 'Crear Cuenta',
-            csrfToken: req.csrfToken()
-        })
+            errors: errors?.length ? errors : null,
+            csrfToken: req.csrfToken(),
+            saved: saved?.length ? saved : null,
+        });
+    };
+
+    // req es empty, render an empty form
+    if (req.method === "GET") {
+        return renderView();
     }
 
     const { name, email, pwd } = req.body;
-    const saved = { name, email };
-
-    const renderWithErrors = (errors) => {
-        return res.render('auth/register', {
-            page: 'Crear Cuenta',
-            errors,
-            csrfToken: req.csrfToken(),
-            saved
-        });
-    };
+    const saveInfo = { name, email };
 
     // check fields' errors
     let valErrors = validationResult(req);
     if (!valErrors.isEmpty()) {
-        return renderWithErrors(valErrors.array());
+        return renderView(valErrors.array(), saveInfo);
     }
 
-    // check existing account by email
+    // check an existing account by email
     const userFound = await User.findOne({ where: { email: email } });
     if (userFound) {
-        return renderWithErrors([{ msg: 'este email ya esta registrado' }]);
+        return renderView([{ msg: 'este email ya esta registrado' }]);
     }
 
-    // create user with a verify email token
-    const user = await User.create({ name, email, pwd, token: generateId() });
-
-    // send confirmation email
+    // create user and send confirmation email
+    const user = await User.create({ name, email, pwd, token: generateId() }, saveInfo);
     emailConfirmAccount({
         name: user.name,
         email: user.email,
         token: user.token
     });
-
 
     // show succesfull message
     res.render('templates/message', {
@@ -123,7 +121,7 @@ const verifyEmail = async (req, res) => {
     const { token } = req.params;
 
     // verify valid token
-    const user = await User.findOne({ where: { token: token } });
+    const user = await User.findOne({ where: { token } });
     if (!user) {
         return res.render('auth/verifyEmail', {
             page: 'Error al verificar email',
@@ -156,35 +154,31 @@ const verifyEmail = async (req, res) => {
  * @returns {void} render recoveryPwd or message view
  */
 const resetPwd = async (req, res) => {
-    // req empty
-    if (req.method === "GET") {
+    const renderView = (errors) => {
         return res.render('auth/recoveryPwd', {
             page: 'Recupera tu password',
-            csrfToken: req.csrfToken()
-        })
+            errors: errors?.length ? errors : null,
+            csrfToken: req.csrfToken(),
+        });
+    };
+
+    // req empty
+    if (req.method === "GET") {
+        return renderView();
     }
 
     const { email } = req.body;
 
-    const renderWithErrors = (errors) => {
-        return res.render('auth/recoveryPwd', {
-            page: 'Recupera tu password',
-            errors,
-            csrfToken: req.csrfToken(),
-            // saved
-        });
-    };
-
     // check fields' errors
     let valErrors = validationResult(req);
     if (!valErrors.isEmpty()) {
-        return renderWithErrors(valErrors.array());
+        return renderView(valErrors.array());
     }
 
     // check if email exist
     const user = await User.findOne({ where: { email } });
     if (!user) {
-        return renderWithErrors([{ msg: 'este email no esta registrado' }]);
+        return renderView([{ msg: 'este email no esta registrado' }]);
     }
 
     // Generate token and send email
@@ -221,7 +215,7 @@ const createNewPwd = async (req, res) => {
     const user = await User.findOne({ where: { token } });
     if (!user) {
         return res.render('auth/verifyEmail', {
-            page: 'Reestablecer Password',
+            page: 'Error al Reestablecer Password',
             message: 'Hubo un error al validar tu informacion',
             error: true
         });
@@ -248,9 +242,7 @@ const createNewPwd = async (req, res) => {
     }
 
     // udpate user data
-    user.pwd = await hashPwd(pwd);
-    user.token = null;
-    await user.save();
+    user.pwd = await user.updatePassword(pwd);
 
     // show succesfull message
     res.render('auth/verifyEmail', {
@@ -293,8 +285,14 @@ const emailValidator = [
 /**
  * rules for validating the recovery password form
  */
-const pwdValidator = [
-    check('pwd').isLength({ min: 8 }).withMessage('el password debe tener al menos 8 caracteres')
+const resetPwdValidator = [
+    check('pwd').isLength({ min: 8 }).withMessage('el password debe tener al menos 8 caracteres'),
+    check('rePwd').custom((value, { req }) => {
+        if (value !== req.body.pwd) {
+            throw new Error('Los passwords no coinciden');
+        }
+        return true;
+    })
 ];
 
 
@@ -306,6 +304,6 @@ export {
     createNewPwd,
     registerValidator,
     emailValidator,
-    pwdValidator,
+    resetPwdValidator,
     loginValidator
 };
