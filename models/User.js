@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import bcrypt from 'bcrypt';
+import { hashPwd } from '../helpers/tokens.js';
 import db from '../config/db.js'
 
 const User = db.define('user', {
@@ -13,15 +13,14 @@ const User = db.define('user', {
     },
     pwd: {
         type: DataTypes.STRING,
-        allowNull:false
+        allowNull: false
     },
     token: DataTypes.STRING,
     isVerified: DataTypes.BOOLEAN
 }, {
-    hooks:{
-        beforeCreate: async function(user) {
-            const salt = await bcrypt.genSalt(10);
-            user.pwd = await bcrypt.hash(user.pwd, salt);
+    hooks: {
+        beforeCreate: async function (user) {
+            user.pwd = await hashPwd(user.pwd);
         }
     }
 }
