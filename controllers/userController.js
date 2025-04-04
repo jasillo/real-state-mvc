@@ -54,10 +54,7 @@ const login = async (req, res) => {
     res.cookie('_token', sesionToken, {
         httpOnly: true,
         // secure: true
-    });
-
-    // await User.create({ name: 'Jorge A', email: 'jorge.asillo@gg.com', pwd: "morituri"})
-    console.log('logeado');
+    }).redirect('/my-properties');
 };
 
 // ========================================================
