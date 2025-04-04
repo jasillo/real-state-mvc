@@ -1,6 +1,6 @@
 import { check, validationResult } from 'express-validator';
 import User from '../models/User.js';
-import { generateId } from '../helpers/tokens.js';
+import { generateId, generateJWT } from '../helpers/tokens.js';
 import { emailConfirmAccount, emailRecoveryPwd } from '../helpers/emails.js'
 
 // ========================================================
@@ -45,9 +45,16 @@ const login = async (req, res) => {
 
     // check password
     const valid = await user.verifyPassword(pwd);
-    if (!valid){
+    if (!valid) {
         return renderView([{ msg: 'password incorrecto' }]);
     }
+
+    // save a sesion token in a cookie
+    const sesionToken = generateJWT({ id: user.id, name: user.name });
+    res.cookie('_token', sesionToken, {
+        httpOnly: true,
+        // secure: true
+    });
 
     // await User.create({ name: 'Jorge A', email: 'jorge.asillo@gg.com', pwd: "morituri"})
     console.log('logeado');
