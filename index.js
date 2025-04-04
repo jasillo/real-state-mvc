@@ -2,6 +2,7 @@ import express from 'express';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/userRoutes.js';
+import propertiesRoutes from './routes/propertiesRoutes.js';
 import db from './config/db.js';
 
 // create server
@@ -33,6 +34,7 @@ app.use(express.static('build'));
 
 // routing
 app.use('/auth', userRoutes);
+app.use('/', propertiesRoutes);
 
 // define port and start proyect
 const port = process.env.PORT;
