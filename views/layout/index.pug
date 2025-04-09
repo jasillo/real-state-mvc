@@ -3,8 +3,13 @@ html(lang="es")
     head
         meta(charset="UTF-8")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        title Bienes Raices | #{page}
+        title Casa Fácil | #{page}
+        link(rel="icon" href="/img/casa_facil_logo.png" type="image/png")
         link(rel="stylesheet", href="/app.css")
     body.min-h-screen.bg-gray-50
+
+        if (logged)
+            include header 
+
         main.mx-auto.container.mt-10.px-2
             block contain 
