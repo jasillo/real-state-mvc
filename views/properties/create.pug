@@ -11,7 +11,8 @@ block contain
 
         div(class="bg-white shadow py-8 px-4 md:px-10 rounded mx-auto max-w-4xl my-8")
             form.space-y-8(action="") 
-
+                input(type="hidden" name="lat" id="lat")
+                input(type="hidden" name="lng" id="lng")
                 div.space-y-3
                     h3.text-lg.leading-6.font-bold.text-gray-900 Informacion General
 
@@ -21,7 +22,7 @@ block contain
 
                     div 
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="description") Descripción
-                        input#title.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Ingresa un titulo. ejm. Casa de playa" type="text" name="title")
+                        textarea#description.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Descripcion general de la propiedad" name="description")
 
                     
 
@@ -43,8 +44,8 @@ block contain
                                 option(value="") - seleccione -
 
                         div(class="md:w-1/3")
-                            label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="toilets") Baños
-                            select#toilets.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="toilets")
+                            label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="toilet") Baños
+                            select#toilet.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="toilet")
                                 option(value="") - seleccione -
                         
                     div(class="md:flex md:gap-4 space-y-4 md:space-y-0")
@@ -55,8 +56,8 @@ block contain
                                 option(value="") - seleccione -
 
                         div(class="md:w-1/3")
-                            label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="pets") Mascotas
-                            select#pets.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="pets")
+                            label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="pet") Mascotas
+                            select#pet.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="pet")
                                 option(value="") - seleccione -
 
                         div(class="md:w-1/3")
@@ -84,16 +85,21 @@ block contain
                                 option(value="") - seleccione -
 
                     div 
-                        label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="description") Direccioón
-                        input#title.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Ingresa un titulo. ejm. Casa de playa" type="text" name="title")
+                        label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="address") Dirección
+                        input#address.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Ingresa un titulo. ejm. Casa de playa" type="text" name="address")
 
                     div#map.h-96
-                    input(type="hidden" name="lat" id="lat")
-                    input(type="hidden" name="lng" id="lng")
 
-                    div 
-                        label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="price") Precio Mensual
-                        input#price.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="alquiler mensual en soles" type="number" name="price"  min="0")   
+                    div(class="md:flex md:gap-4 space-y-4 md:space-y-0")
+
+                        div(class="md:w-1/2")
+                            label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="price") Precio
+                            input#price.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="precio de alquiler en soles" type="number" name="price"  min="0")   
+
+                        div(class="md:w-1/2")
+                            label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="contract") Tipo de Contrato
+                            select#contract.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="contract")
+                                option(value="") - seleccione -
 
 
                 Input(class="w-full bg-stone-600 hover:bg-stone-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Publicar")         
