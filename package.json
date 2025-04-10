@@ -6,13 +6,16 @@
   "type": "module",
   "scripts": {
     "start": "nodemon ./index.js",
-    "css": "postcss ./public/css/tailwind.css -o ./build/app.css --watch"
+    "css": "postcss ./public/css/tailwind.css -o ./build/app.css --watch",
+    "js": "webpack --watch"
   },
   "keywords": [
     "MVC",
     "MyQSL",
     "Pug",
-    "Sequelize"
+    "tailwind",
+    "Sequelize",
+    "Leaflet"
   ],
   "author": "Jorge Asillo",
   "license": "ISC",
@@ -34,6 +37,8 @@
     "nodemon": "^3.1.9",
     "postcss": "^8.5.3",
     "postcss-cli": "^11.0.1",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "webpack": "^5.99.5",
+    "webpack-cli": "^6.0.1"
   }
 }

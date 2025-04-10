@@ -6,10 +6,13 @@ html(lang="es")
         title Casa Fácil | #{page}
         link(rel="icon" href="/img/casa_facil_logo.png" type="image/png")
         link(rel="stylesheet", href="/app.css")
+        block styles
     body.min-h-screen.bg-gray-50
 
         if (logged)
             include header 
 
         main.mx-auto.container.mt-10.px-2
-            block contain 
+            block contain
+
+        block scripts
