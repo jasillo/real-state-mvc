@@ -54,18 +54,6 @@ Property.init(
             type: DataTypes.STRING,
             allowNull : false
         },
-        region: {
-            type: DataTypes.NUMBER,
-            allowNull : false
-        },
-        province: {
-            type: DataTypes.NUMBER,
-            allowNull : false
-        },
-        district: {
-            type: DataTypes.NUMBER,
-            allowNull : false
-        },
         published: {
             type: DataTypes.BOOLEAN,
             allowNull : false,

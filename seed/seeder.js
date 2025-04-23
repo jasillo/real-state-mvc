@@ -1,9 +1,8 @@
-import { exit } from 'node:process';
-import categoriesData from './categoryData.js';
-import Category from '../models/Category.js';
-import contractData from './contractData.js';
-import Contract from '../models/Contract.js';
-import db from '../config/db.js';
+import { exit } from 'node:process'
+import categoriesData from './categoryData.js'
+import contractData from './contractData.js'
+import { Category, Contract } from '../models/index.js'
+import db from '../config/db.js'
 
 const importData = async () => {
     try {
@@ -13,8 +12,8 @@ const importData = async () => {
         await Promise.all([
             await Category.bulkCreate(categoriesData),
             await Contract.bulkCreate(contractData)
-        ]);
-        
+        ]);db:
+
         exit(0);
     } catch (error) {
         console.log(error);
@@ -25,10 +24,10 @@ const importData = async () => {
 const deleteData = async () => {
     try {
         await Promise.all([
-            await Category.destroy({where:{}, truncate: true}),
-            await Contract.destroy({where:{}, truncate: true})
+            await Category.destroy({ where: {}, truncate: true }),
+            await Contract.destroy({ where: {}, truncate: true })
         ]);
-        
+
         exit(0);
     } catch (error) {
         console.log(error);
@@ -36,10 +35,10 @@ const deleteData = async () => {
     }
 };
 
-if (process.argv[2] === "-i" ) {
+if (process.argv[2] === "-i") {
     importData();
 }
 
-if (process.argv[2] === "-d" ) {
+if (process.argv[2] === "-d") {
     deleteData();
 }

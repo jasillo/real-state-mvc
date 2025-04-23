@@ -9,8 +9,15 @@ block contain
         //-     span.font-normal Fácil
         h2.text-center.text-2xl.font-extrabold.text-stone-700= page
 
+        if (errors)
+            div.max-w-4xl.mx-auto.bg-rose-400.mt-4.py-2.px-4
+                ul.list-disc
+                each error in errors
+                    li.text-white.uppercase.text-xs.p-1.font-bold.my-0= error.msg
+
         div(class="bg-white shadow py-8 px-4 md:px-10 rounded mx-auto max-w-4xl my-8")
-            form.space-y-8(action="") 
+            form.space-y-8(method="POST" ) 
+                input(type="hidden" name="_csrf" value= csrfToken)
                 input(type="hidden" name="lat" id="lat")
                 input(type="hidden" name="lng" id="lng")
                 div.space-y-3
@@ -18,18 +25,19 @@ block contain
 
                     div 
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="title") Titulo
-                        input#title.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Ingresa un titulo. ejm. Casa de playa" type="text" name="title")
+                        input#title.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Ingresa un titulo. ejm. Casa de playa" type="text" name="title" value=save.title || '')
 
                     div 
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="description") Descripción
-                        textarea#description.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Descripcion general de la propiedad" name="description")
+                        textarea#description.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Descripcion general de la propiedad" name="description")= save.description || ''
 
                     div
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="category") Categoria
                         select#category.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="category")
                             option(value="") - seleccione -
                             each item in categoryOpts
-                                option(value=item.id class="capitalize")= item.name
+                                option(value=item.id class="capitalize" selected=+save.category === item.id : null)= item.name
+                                //- option(value=item.id class="capitalize")= item.name
 
                     div(class="md:flex md:gap-4 space-y-4 md:space-y-0")
 
@@ -38,21 +46,21 @@ block contain
                             select#rooms.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="rooms")
                                 option(value="") - seleccione -
                                 each item in roomsOpts
-                                    option(value=item)= item
+                                    option(value=item selected=save.rooms === item : null)= item
 
                         div(class="md:w-1/3")
                             label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="parking") Estacionamiento
                             select#parking.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="parking")
                                 option(value="") - seleccione -
                                 each item in parkingOpts
-                                    option(value=item)= item
+                                    option(value=item selected=save.parking === item : null)= item
 
                         div(class="md:w-1/3")
                             label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="toilet") Baños
                             select#toilet.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="toilet")
                                 option(value="") - seleccione -
                                 each item in toiletOpts
-                                    option(value=item)= item
+                                    option(value=item selected=save.toilet === item : null)= item
                         
                     div(class="md:flex md:gap-4 space-y-4 md:space-y-0")
 
@@ -60,42 +68,42 @@ block contain
                             label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="pet") Mascotas
                             select#pet.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="pet")
                                 option(value="") - seleccione -
-                                option(value="1") Si
-                                option(value="0") No
+                                option(value="true" selected=save.pet === 'true' : null) Si
+                                option(value="false" selected=save.pet === 'false' : null) No
 
                         div(class="md:w-1/3")
                             label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="furnished") Amueblado
                             select#furnished.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="furnished")
                                 option(value="") - seleccione -
-                                option(value="1") Si
-                                option(value="0") No
+                                option(value="true" selected=save.furnished === 'true' : null) Si
+                                option(value="false" selected=save.furnished === 'false' : null) No
                     
                     div(class="md:w-1/2")
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="area") Area
-                        input#area.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="area en m2" type="number" name="area"  min="0")       
+                        input#area.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="area en m2" type="number" name="area"  min="0" value=save.area || '')       
 
                     h3.text-lg.leading-6.font-bold.text-gray-900.pt-8 Ubicación
 
-                    div(class="md:flex md:gap-4 space-y-4 md:space-y-0")
+                    //- div(class="md:flex md:gap-4 space-y-4 md:space-y-0")
 
-                        div(class="md:w-1/3")
-                            label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="region") Departamento
-                            select#region.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="region")
-                                option(value="") - seleccione -
+                    //-     div(class="md:w-1/3")
+                    //-         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="region") Departamento
+                    //-         select#region.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="region")
+                    //-             option(value="") - seleccione -
 
-                        div(class="md:w-1/3")
-                            label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="province") Provincia
-                            select#province.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="province")
-                                option(value="") - seleccione -
+                    //-     div(class="md:w-1/3")
+                    //-         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="province") Provincia
+                    //-         select#province.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="province")
+                    //-             option(value="") - seleccione -
 
-                        div(class="md:w-1/3")
-                            label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="district") Distrito
-                            select#district.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="district")
-                                option(value="") - seleccione -
+                    //-     div(class="md:w-1/3")
+                    //-         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="district") Distrito
+                    //-         select#district.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="district")
+                    //-             option(value="") - seleccione -
 
                     div 
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="address") Dirección
-                        input#address.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="ejem. calle 123 zona A" type="text" name="address")
+                        input#address.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="ejem. calle 123 zona A" type="text" name="address" value=save.address || '')
 
                     div#map.h-96
 
@@ -103,14 +111,14 @@ block contain
 
                         div(class="md:w-1/2")
                             label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="price") Precio
-                            input#price.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="precio de alquiler en soles" type="number" name="price"  min="0")   
+                            input#price.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="precio de alquiler en soles" type="number" name="price"  min="0" value=save.price || '')   
 
                         div(class="md:w-1/2")
                             label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="contract") Tipo de Contrato
                             select#contract.w-full.px.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="contract")
                                 option(value="") - seleccione -
                                 each item in contractOpts
-                                    option(value=item.id class="capitalize")= item.name
+                                    option(value=item.id class="capitalize" selected=+save.contract === item.id : null)= item.name
 
 
                 Input(class="w-full bg-stone-600 hover:bg-stone-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Publicar")         
