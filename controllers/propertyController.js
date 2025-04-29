@@ -1,6 +1,5 @@
-import { check, validationResult } from 'express-validator';
-import Category from '../models/Category.js'
-import Contract from '../models/Contract.js'
+import { check, validationResult } from 'express-validator'
+import { Category, Contract, Property } from '../models/index.js'
 
 const admin = (req, res) => {
     res.render('properties/admin', {
@@ -11,7 +10,7 @@ const admin = (req, res) => {
 
 const createProperty = async (req, res) => {
     // render create property view
-    const renderView = async(errors) => {
+    const renderView = async (errors) => {
         const [categoryOpts, contractOpts] = await Promise.all([
             Category.findAll(),
             Contract.findAll()
@@ -19,7 +18,7 @@ const createProperty = async (req, res) => {
         const roomsOpts = Array.from({ length: 10 }, (_, i) => String(i + 1));
         const parkingOpts = Array.from({ length: 5 }, (_, i) => String(i));
         const toiletOpts = Array.from({ length: 5 }, (_, i) => String(i));
-        
+
         return res.render('properties/create', {
             page: 'Crear Propiedad',
             csrfToken: req.csrfToken(),
@@ -44,6 +43,46 @@ const createProperty = async (req, res) => {
     if (!valErrors.isEmpty()) {
         return renderView(valErrors.array());
     }
+
+    // create property
+    const {
+        title,
+        description,
+        rooms,
+        parking,
+        toilet,
+        area,
+        pet,
+        price,
+        furnished,
+        lat,
+        lng,
+        category: categoryId,
+        contract: contractId,
+    } = req.body;
+    const {id: userId} = req.user;
+
+
+    try {
+        const property = await Property.create({
+            title,
+            description,
+            rooms,
+            parking,
+            toilet,
+            area,
+            pet,
+            price,
+            furnished,
+            lat,
+            lng,
+            categoryId,
+            contractId,
+            userId
+        });
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 const deleteProperty = (req, res) => {
@@ -57,7 +96,7 @@ const createValidator = [
     check('title').notEmpty().withMessage('El Titulo no puede estar en blanco'),
     check('description')
         .notEmpty().withMessage('La descripcion no puede ir vacia.')
-        .isLength({max: 250}).withMessage('La descripcion es muy larga.'),
+        .isLength({ max: 250 }).withMessage('La descripcion es muy larga.'),
     check('category').isNumeric().withMessage('Seleccione una categoria.'),
     check('rooms').isNumeric().withMessage('Seleccione una cantidad de habitaciones.'),
     check('parking').isNumeric().withMessage('Seleccione una cantidad de estacionamientos.'),

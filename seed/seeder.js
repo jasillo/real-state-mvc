@@ -1,7 +1,8 @@
 import { exit } from 'node:process'
 import categoriesData from './categoryData.js'
 import contractData from './contractData.js'
-import { Category, Contract } from '../models/index.js'
+import userData from './userData.js'
+import { Category, Contract, User, Property } from '../models/index.js'
 import db from '../config/db.js'
 
 const importData = async () => {
@@ -10,9 +11,10 @@ const importData = async () => {
         await db.sync();
 
         await Promise.all([
-            await Category.bulkCreate(categoriesData),
-            await Contract.bulkCreate(contractData)
-        ]);db:
+            Category.bulkCreate(categoriesData),
+            Contract.bulkCreate(contractData),
+            User.bulkCreate(userData)
+        ]);
 
         exit(0);
     } catch (error) {
@@ -23,11 +25,12 @@ const importData = async () => {
 
 const deleteData = async () => {
     try {
-        await Promise.all([
-            await Category.destroy({ where: {}, truncate: true }),
-            await Contract.destroy({ where: {}, truncate: true })
-        ]);
-
+        // await Promise.all([
+        //     Category.destroy({ where: {} }),
+        //     Contract.destroy({ where: {} }),
+        //     User.destroy({ where: {} })
+        // ]);
+        await db.sync({ force: true });
         exit(0);
     } catch (error) {
         console.log(error);

@@ -18,8 +18,8 @@ block contain
         div(class="bg-white shadow py-8 px-4 md:px-10 rounded mx-auto max-w-4xl my-8")
             form.space-y-8(method="POST" ) 
                 input(type="hidden" name="_csrf" value= csrfToken)
-                input(type="hidden" name="lat" id="lat")
-                input(type="hidden" name="lng" id="lng")
+                input(type="hidden" name="lat" id="lat" value=save.lat || '')
+                input(type="hidden" name="lng" id="lng" value=save.lng || '')
                 div.space-y-3
                     h3.text-lg.leading-6.font-bold.text-gray-900 Informacion General
 

@@ -1,6 +1,6 @@
 (function() {
-    const lat = -16.4059247;
-    const lng = -71.5325414;
+    const lat = document.querySelector('#lat').value || -16.4059247;
+    const lng = document.querySelector('#lng').value || -71.5325414;
     const map = L.map('map').setView([lat, lng], 8);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {

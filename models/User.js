@@ -13,7 +13,7 @@ class User extends Model {
         const salt = await bcrypt.genSalt(10);
         this.pwd = await bcrypt.hash(newPassword, salt);
         this.token = null;
-        await this.save(); 
+        await this.save();
     }
 
     /**
@@ -58,6 +58,11 @@ User.init(
                 user.pwd = await bcrypt.hash(user.pwd, 10);
             },
         },
+        scopes: {
+            minimum: {
+                attributes: ['id', 'name', 'email']
+            }
+        }
     }
 );
 
