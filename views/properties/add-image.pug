@@ -1,0 +1,17 @@
+extends ../layout/authenticated
+
+block styles 
+    link(rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="")
+
+block contain
+    div.py-10
+        h2.text-center.text-2xl.font-extrabold.text-stone-700= page
+
+        div(class="bg-white shadow py-8 px-4 md:px-10 rounded mx-auto max-w-4xl my-8")
+            form.space-y-8(method="POST" ) 
+                input(type="hidden" name="_csrf" value= csrfToken)
+
+                Input(class="w-full bg-stone-600 hover:bg-stone-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Publicar")         
+
+block scripts
+    

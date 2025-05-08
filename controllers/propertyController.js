@@ -2,9 +2,8 @@ import { check, validationResult } from 'express-validator'
 import { Category, Contract, Property } from '../models/index.js'
 
 const admin = (req, res) => {
-    res.render('properties/admin', {
-        page: 'Mis propiedades',
-        logged: true
+    res.render('properties/admin-panel', {
+        page: 'Mis propiedades'
     });
 };
 
@@ -22,7 +21,6 @@ const createProperty = async (req, res) => {
         return res.render('properties/create', {
             page: 'Crear Propiedad',
             csrfToken: req.csrfToken(),
-            logged: true,
             categoryOpts,
             contractOpts,
             roomsOpts,
@@ -80,15 +78,17 @@ const createProperty = async (req, res) => {
             contractId,
             userId
         });
+
+        const {id} = property;
+        res.redirect(`my-properties/add-image/${id}`);
     } catch (error) {
         console.log(error);
     }
 };
 
 const deleteProperty = (req, res) => {
-    res.render('properties/admin', {
-        page: 'Mis propiedades',
-        logged: true
+    res.render('properties/admin-panel', {
+        page: 'Mis propiedades'
     });
 };
 
@@ -110,9 +110,16 @@ const createValidator = [
     check('contract').isNumeric().withMessage('seleccione el tipo de contrato.')
 ];
 
+const addImage = async(req, res) => {
+    res.render('properties/add-image', {
+        page: 'Agregar Imagen'
+    });
+}
+
 export {
     admin,
     createProperty,
     deleteProperty,
+    addImage,
     createValidator
 };
