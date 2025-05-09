@@ -1,5 +1,6 @@
 import { check, validationResult } from 'express-validator'
 import { Category, Contract, Property } from '../models/index.js'
+import upload from '../middleware/uploadImage.js'
 
 const admin = (req, res) => {
     res.render('properties/admin-panel', {
@@ -58,7 +59,7 @@ const createProperty = async (req, res) => {
         category: categoryId,
         contract: contractId,
     } = req.body;
-    const {id: userId} = req.user;
+    const { id: userId } = req.user;
 
 
     try {
@@ -79,7 +80,7 @@ const createProperty = async (req, res) => {
             userId
         });
 
-        const {id} = property;
+        const { id } = property;
         res.redirect(`my-properties/add-image/${id}`);
     } catch (error) {
         console.log(error);
@@ -110,10 +111,36 @@ const createValidator = [
     check('contract').isNumeric().withMessage('seleccione el tipo de contrato.')
 ];
 
-const addImage = async(req, res) => {
-    res.render('properties/add-image', {
-        page: 'Agregar Imagen'
-    });
+const addImage = async (req, res) => {
+    const { id } = req.params;
+
+    // validate property exist, is not published and owner
+    const property = await Property.findByPk(id);
+    if (!property ||
+        property.published ||
+        property.userId.toString() !== req.user.id.toString()
+    ) {
+        return res.redirect('/my-properties');
+    }
+
+    // render Get method
+    if (req.method === "GET") {
+        return res.render('properties/add-image', {
+            page: 'Agregar Imagen',
+            csrfToken: req.csrfToken(),
+            property
+        });
+    }
+
+    // update database
+    try {
+        property.published = true;
+        await property.save();
+    } catch (error) {
+        console.log(error);
+    }
+
+    res.redirect('/my-properties');
 }
 
 export {
