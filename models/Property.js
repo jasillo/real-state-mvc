@@ -58,12 +58,21 @@ Property.init(
             type: DataTypes.BOOLEAN,
             allowNull : false,
             defaultValue: false
+        },
+        image: {
+            type: DataTypes.STRING,
+            allowNull : true
         }
     },
     {
         sequelize: db,
         modelName: "property",
-        tableName: "properties"
+        tableName: "properties",
+        scopes: {
+            adminPanel: {
+                attributes: ['id', 'title', 'price', 'image']
+            }
+        }
     }
 );
 

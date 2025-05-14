@@ -8,7 +8,7 @@ import db from '../config/db.js'
 const importData = async () => {
     try {
         await db.authenticate();
-        await db.sync();
+        await db.sync({ force: true });
 
         await Promise.all([
             Category.bulkCreate(categoriesData),

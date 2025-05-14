@@ -31,6 +31,7 @@ app.set('views', './views');
 // public static
 app.use(express.static('public'));
 app.use(express.static('build'));
+app.use('/images', express.static('uploads'));
 
 // routing
 app.use('/auth', userRoutes);

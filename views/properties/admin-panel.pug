@@ -8,3 +8,23 @@ block contain
 
         a(href="/my-properties/create" class="rounded py-2 px-10 my-5 bg-stone-600 hover:bg-stone-700 text-sm text-white text-center uppercase inline-block font-bold") Publicar Propiedad
         
+        if properties
+            //- pre=JSON.stringify(properties, undefined, 2)
+
+            div(class="bg-white shadow rounded-lg")
+                ul(class="divide-y divide-gray-200")
+                    each item in properties 
+                        li
+                            div(class="p-6 w-full flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-8 md:space-y-0 gap-4")
+                                div(class="ms:w-1/4 md:w-1/6")
+                                    img(src=item.imgURL alt=`Ìmagen propiedad ${item.title}` class="w-full block")
+                                div(class="ms:w-2/4 md:w-3/6 lg:w-4/6 space-y-3")
+                                    a(class="block text-2xl font-extrabold text-stonr-600 truncate" href="#")=item.title
+                                    p(class="text-sm text-black font-bold")=item.category.name
+                                    p(class="text-sm text-gray-500 font-bold flex items-center")="S/. "+item.price+" "+item.contract.name
+                                        
+
+                                div(class="ms:w-1/4 md:w-2/6 lg:w-1/6" )
+        else
+            p.text-center No tienes propiedades. 
+            

@@ -2,19 +2,47 @@ import { check, validationResult } from 'express-validator'
 import { Category, Contract, Property } from '../models/index.js'
 import upload from '../middleware/uploadImage.js'
 
-const admin = (req, res) => {
+/**
+ * Show all user's properties
+ */
+const admin = async (req, res) => {
+    // get user id
+    const { id } = req.user;
+    const properties = await Property.scope('adminPanel').findAll({
+        where: { userId: id },
+        include: [
+            {model: Category, as: 'category', attributes: ['name']},
+            {model: Contract, as: 'contract', attributes: ['name']}
+        ]        
+    });
+    // add imageUrl
+    for (let i  = 0; i < properties.length; i++) {
+        const rowData = properties[i].toJSON();
+        rowData.imgURL = `/images/${id}/${properties[i].id}/${properties[i].image}`;
+        properties[i] = rowData;
+    }
+
     res.render('properties/admin-panel', {
-        page: 'Mis propiedades'
+        page: 'Mis propiedades',
+        properties
     });
 };
 
+/**
+ * Create Property: GET and POST
+ * if create success -> go to add-image 
+ * @returns {void} render create view or redirect to add-image
+ */
 const createProperty = async (req, res) => {
     // render create property view
     const renderView = async (errors) => {
+        // consult categories and contract for filling select's options
         const [categoryOpts, contractOpts] = await Promise.all([
             Category.findAll(),
             Contract.findAll()
         ]);
+
+        // create numeric data for filling rooms, parking and toilet
         const roomsOpts = Array.from({ length: 10 }, (_, i) => String(i + 1));
         const parkingOpts = Array.from({ length: 5 }, (_, i) => String(i));
         const toiletOpts = Array.from({ length: 5 }, (_, i) => String(i));
@@ -81,14 +109,14 @@ const createProperty = async (req, res) => {
         });
 
         const { id } = property;
-        res.redirect(`my-properties/add-image/${id}`);
+        res.redirect(`/my-properties/add-image/${id}`);
     } catch (error) {
         console.log(error);
     }
 };
 
 const deleteProperty = (req, res) => {
-    res.render('properties/admin-panel', {
+    res.render('/properties/admin-panel', {
         page: 'Mis propiedades'
     });
 };
@@ -135,6 +163,7 @@ const addImage = async (req, res) => {
     // update database
     try {
         property.published = true;
+        property.image = req.file.filename;
         await property.save();
     } catch (error) {
         console.log(error);
